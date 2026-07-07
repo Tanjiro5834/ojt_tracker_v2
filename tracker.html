@@ -1,0 +1,420 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
+
+  :root{
+    --paper:#FFF6F9;
+    --paper-dark:#FFE9F1;
+    --ink:#5C3548;
+    --ink-soft:#B0819A;
+    --rule:#FFCFE0;
+    --stamp:#FF6F9C;
+    --stamp-dark:#E14E82;
+    --stamp-tint:#FFE0EC;
+    --lilac:#C9A6E0;
+    --danger:#E0577A;
+    --font-display:'Fredoka','Quicksand',sans-serif;
+    --font-body:'Quicksand',sans-serif;
+    --font-script:'Caveat',cursive;
+  }
+  *{box-sizing:border-box;}
+  .ojt-app{
+    background:
+      radial-gradient(circle at 8% 0%, rgba(255,255,255,.7), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(201,166,224,.18), transparent 50%),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    max-width:640px;
+    margin:0 auto;
+    padding:34px 28px 44px;
+    border-radius:28px;
+    border:1px solid var(--rule);
+    box-shadow:0 20px 45px -28px rgba(225,78,130,.45), 0 1px 0 rgba(255,255,255,.7) inset;
+    position:relative;
+    overflow:hidden;
+  }
+  .ojt-app::before{
+    content:"✿";
+    position:absolute;
+    top:-18px;right:-10px;
+    font-size:110px;
+    color:var(--stamp);
+    opacity:.08;
+    transform:rotate(12deg);
+  }
+  .ojt-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px dashed var(--rule);
+    padding-bottom:14px;
+    margin-bottom:24px;
+    position:relative;
+  }
+  .ojt-header h1{
+    font-family:var(--font-display);
+    font-size:30px;
+    letter-spacing:.2px;
+    margin:0;
+    font-weight:700;
+    color:var(--stamp-dark);
+  }
+  .ojt-header h1 .flourish{
+    font-family:var(--font-script);
+    font-weight:600;
+    color:var(--lilac);
+    font-size:22px;
+    margin-left:6px;
+  }
+  .ojt-header .sub{
+    font-family:var(--font-script);
+    font-size:16px;
+    color:var(--ink-soft);
+    margin-top:2px;
+    font-weight:600;
+  }
+  .ojt-reset{
+    background:#fff;
+    border:1.5px solid var(--rule);
+    color:var(--ink-soft);
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:11.5px;
+    padding:7px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .ojt-reset:hover{border-color:var(--danger);color:var(--danger);background:#fff5f7;}
+
+  .card{
+    background:var(--paper-dark);
+    border:1px solid var(--rule);
+    border-radius:20px;
+    padding:20px 20px 22px;
+    margin-bottom:18px;
+    box-shadow:0 1px 0 rgba(255,255,255,.6) inset;
+    position:relative;
+  }
+  .card h2{
+    font-family:var(--font-display);
+    font-size:16px;
+    margin:0 0 16px;
+    color:var(--stamp-dark);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2::before{
+    content:"♥";
+    font-size:12px;
+    color:var(--stamp);
+  }
+  .card h2::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--rule);
+  }
+
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+  .field label{font-size:11px;letter-spacing:.3px;color:var(--ink-soft);font-weight:600;}
+  .field input,.field textarea{
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:14px;
+    padding:10px 13px;
+    border:1.5px solid var(--rule);
+    border-radius:14px;
+    background:#fff;
+    color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field textarea{resize:vertical;min-height:50px;line-height:1.5;border-radius:16px;}
+  .field input:focus,.field textarea:focus{
+    outline:none;
+    border-color:var(--stamp);
+    box-shadow:0 0 0 4px var(--stamp-tint);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .btn{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:.2px;
+    background:linear-gradient(135deg,var(--stamp),var(--lilac));
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:12px 18px;
+    cursor:pointer;
+    width:100%;
+    box-shadow:0 8px 18px -8px rgba(225,78,130,.6);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px -8px rgba(225,78,130,.7);}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* progress / badge */
+  .progress-wrap{display:flex;align-items:center;gap:20px;margin-bottom:6px;}
+  .stamp-badge{
+    flex:0 0 auto;
+    width:82px;height:82px;
+    border:3px solid #fff;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:700;
+    background:linear-gradient(135deg,var(--stamp),var(--lilac));
+    box-shadow:0 8px 16px -6px rgba(225,78,130,.55);
+  }
+  .stamp-badge span{font-size:19px;}
+  .progress-track{
+    flex:1;
+    height:16px;
+    background:#fff;
+    border:1.5px solid var(--rule);
+    border-radius:999px;
+    position:relative;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--stamp),var(--lilac));
+    border-radius:999px;
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-meta{
+    display:flex;justify-content:space-between;
+    font-size:12px;color:var(--ink-soft);margin-top:9px;
+    font-weight:600;
+  }
+
+  .entry{
+    display:grid;
+    grid-template-columns:84px 50px 1fr;
+    gap:14px;
+    padding:13px 0;
+    border-bottom:1px dashed var(--rule);
+    position:relative;
+    transition:background .15s ease;
+  }
+  .entry:last-child{border-bottom:none;}
+  .entry:hover{background:rgba(255,111,156,.06);border-radius:12px;}
+  .entry .date{font-size:11.5px;color:var(--ink-soft);padding-top:1px;font-weight:600;}
+  .entry .hrs{font-size:12px;font-weight:700;color:var(--stamp-dark);padding-top:1px;}
+  .entry .task{font-family:var(--font-display);font-size:14.5px;font-weight:600;margin:0 0 3px;color:var(--ink);}
+  .entry .task::before{content:"♡ ";color:var(--stamp);}
+  .entry .remarks{font-size:12px;color:var(--ink-soft);margin:0;line-height:1.5;}
+  .entry .del{
+    position:absolute;right:0;top:12px;
+    background:#fff;border:1px solid var(--rule);
+    color:var(--ink-soft);width:22px;height:22px;border-radius:50%;
+    cursor:pointer;font-size:11px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .entry .del:hover{color:var(--danger);border-color:var(--danger);}
+  .empty{font-size:13px;color:var(--ink-soft);text-align:center;padding:18px 0;font-family:var(--font-script);}
+  .loading{font-size:15px;color:var(--ink-soft);text-align:center;padding:28px 0;font-family:var(--font-script);}
+</style>
+
+<div class="ojt-app" id="app">
+  <div class="loading">loading your logbook… ✿</div>
+</div>
+
+<script>
+(function(){
+  const app = document.getElementById('app');
+  const CONFIG_KEY = 'ojt-config';
+  const ENTRIES_KEY = 'ojt-entries';
+
+  let config = null;
+  let entries = [];
+
+  function fmtDate(d){
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
+  }
+
+  async function loadData(){
+    try{
+      const c = await window.storage.get(CONFIG_KEY, false);
+      config = c ? JSON.parse(c.value) : null;
+    }catch(e){ config = null; }
+    try{
+      const e = await window.storage.get(ENTRIES_KEY, false);
+      entries = e ? JSON.parse(e.value) : [];
+    }catch(e){ entries = []; }
+    render();
+  }
+
+  async function saveConfig(cfg){
+    config = cfg;
+    try{
+      await window.storage.set(CONFIG_KEY, JSON.stringify(cfg), false);
+    }catch(e){ console.error('save config failed', e); }
+    render();
+  }
+
+  async function saveEntries(){
+    try{
+      await window.storage.set(ENTRIES_KEY, JSON.stringify(entries), false);
+    }catch(e){ console.error('save entries failed', e); }
+    render();
+  }
+
+  function totalHours(){
+    return entries.reduce((sum,e)=>sum+Number(e.hours||0),0);
+  }
+
+  function renderSetup(){
+    app.innerHTML = `
+      <div class="ojt-header">
+        <div>
+          <h1>Julie's OJT Diary<span class="flourish">✿</span></h1>
+          <div class="sub">let's set up your training record</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Start Details</h2>
+        <form id="setupForm">
+          <div class="field">
+            <label for="startDate">Date Started</label>
+            <input type="date" id="startDate" required>
+          </div>
+          <div class="field">
+            <label for="reqHours">Required Hours (total)</label>
+            <input type="number" id="reqHours" min="1" step="1" placeholder="e.g. 486" required>
+          </div>
+          <button class="btn" type="submit">Start My Diary</button>
+        </form>
+      </div>
+    `;
+    document.getElementById('setupForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const startDate = document.getElementById('startDate').value;
+      const reqHours = Number(document.getElementById('reqHours').value);
+      if(!startDate || !reqHours || reqHours<=0) return;
+      await saveConfig({startDate, requiredHours: reqHours});
+    });
+  }
+
+  function renderDashboard(){
+    const done = totalHours();
+    const pct = Math.min(100, Math.round((done/config.requiredHours)*100));
+    const remaining = Math.max(0, config.requiredHours - done);
+
+    const sorted = [...entries].sort((a,b)=> b.date.localeCompare(a.date));
+
+    app.innerHTML = `
+      <div class="ojt-header">
+        <div>
+          <h1>OJT Diary<span class="flourish">✿</span></h1>
+          <div class="sub">started ${fmtDate(config.startDate)}</div>
+        </div>
+        <button class="ojt-reset" id="resetBtn" type="button">Reset</button>
+      </div>
+
+      <div class="card">
+        <h2>Progress</h2>
+        <div class="progress-wrap">
+          <div class="stamp-badge"><span>${pct}%</span></div>
+          <div style="flex:1">
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div class="progress-meta">
+              <span>${done} / ${config.requiredHours} hrs</span>
+              <span>${remaining} hrs to go</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Log Today's Activity</h2>
+        <form id="entryForm">
+          <div class="row2">
+            <div class="field">
+              <label for="entryDate">Date</label>
+              <input type="date" id="entryDate" required>
+            </div>
+            <div class="field">
+              <label for="entryHours">Hours</label>
+              <input type="number" id="entryHours" min="0.5" step="0.5" placeholder="e.g. 8" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="entryTask">Task</label>
+            <input type="text" id="entryTask" placeholder="e.g. Built login module" required>
+          </div>
+          <div class="field">
+            <label for="entryRemarks">Remarks</label>
+            <textarea id="entryRemarks" placeholder="Notes, blockers, learnings..."></textarea>
+          </div>
+          <button class="btn" type="submit">Add Entry</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Entries (${entries.length})</h2>
+        <div id="entryList">
+          ${sorted.length ? sorted.map(e=>`
+            <div class="entry" data-id="${e.id}">
+              <div class="date">${fmtDate(e.date)}</div>
+              <div class="hrs">${e.hours}h</div>
+              <div>
+                <p class="task">${escapeHtml(e.task)}</p>
+                ${e.remarks ? `<p class="remarks">${escapeHtml(e.remarks)}</p>` : ''}
+              </div>
+              <button class="del" data-id="${e.id}" title="Delete entry">✕</button>
+            </div>
+          `).join('') : '<div class="empty">no entries yet — add your first one! ♡</div>'}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('entryForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const date = document.getElementById('entryDate').value;
+      const hours = Number(document.getElementById('entryHours').value);
+      const task = document.getElementById('entryTask').value.trim();
+      const remarks = document.getElementById('entryRemarks').value.trim();
+      if(!date || !hours || !task) return;
+      entries.push({id: Date.now().toString(36), date, hours, task, remarks});
+      await saveEntries();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', async ()=>{
+      if(!confirm('Reset diary? This clears your start date and required hours (entries stay).')) return;
+      try{ await window.storage.delete(CONFIG_KEY, false); }catch(e){}
+      config = null;
+      render();
+    });
+
+    document.querySelectorAll('.del').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.getAttribute('data-id');
+        entries = entries.filter(e=>e.id!==id);
+        await saveEntries();
+      });
+    });
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function render(){
+    if(!config){ renderSetup(); }
+    else{ renderDashboard(); }
+  }
+
+  loadData();
+})();
+</script>
