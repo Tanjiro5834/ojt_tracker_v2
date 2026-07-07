@@ -152,7 +152,6 @@
     border-color:var(--stamp);
     box-shadow:0 0 0 4px var(--stamp-tint);
   }
-  .field .hint{font-size:10.5px;color:var(--ink-soft);font-weight:500;margin-top:2px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
   .btn{
@@ -291,12 +290,10 @@
     return dt.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
   }
 
-  // "6 30" -> {hours:6, minutes:30}. Overflow minutes roll into hours. Returns null if invalid.
-  function parseHoursInput(str){
-    const parts = String(str).trim().split(/\s+/).filter(Boolean).map(Number);
-    if(!parts.length || parts.some(n=>Number.isNaN(n)) ) return null;
-    let hours = parts[0] || 0;
-    let minutes = parts[1] || 0;
+  // Takes raw hours/minutes input, normalizes overflow (e.g. 6h 90m -> 7h 30m). Returns null if invalid.
+  function normalizeHM(hoursRaw, minutesRaw){
+    let hours = Number(hoursRaw) || 0;
+    let minutes = Number(minutesRaw) || 0;
     if(hours < 0 || minutes < 0) return null;
     hours += Math.floor(minutes / 60);
     minutes = minutes % 60;
@@ -419,15 +416,18 @@
           <div class="card">
             <h2>Log Today's Activity</h2>
             <form id="entryForm">
+              <div class="field">
+                <label for="entryDate">Date</label>
+                <input type="date" id="entryDate" required>
+              </div>
               <div class="row2">
                 <div class="field">
-                  <label for="entryDate">Date</label>
-                  <input type="date" id="entryDate" required>
+                  <label for="entryHours">Hours</label>
+                  <input type="number" id="entryHours" min="0" step="1" placeholder="e.g. 6" required>
                 </div>
                 <div class="field">
-                  <label for="entryHours">Hours &amp; Minutes</label>
-                  <input type="text" id="entryHours" inputmode="numeric" placeholder="e.g. 6 30" required>
-                  <div class="hint">hours space minutes — e.g. "6 30" = 6h 30m</div>
+                  <label for="entryMinutes">Minutes</label>
+                  <input type="number" id="entryMinutes" min="0" max="59" step="1" placeholder="e.g. 30">
                 </div>
               </div>
               <div class="field">
@@ -467,7 +467,10 @@
     document.getElementById('entryForm').addEventListener('submit', (ev)=>{
       ev.preventDefault();
       const date = document.getElementById('entryDate').value;
-      const parsed = parseHoursInput(document.getElementById('entryHours').value);
+      const parsed = normalizeHM(
+        document.getElementById('entryHours').value,
+        document.getElementById('entryMinutes').value
+      );
       const task = document.getElementById('entryTask').value.trim();
       const remarks = document.getElementById('entryRemarks').value.trim();
       if(!date || !parsed || !task) return;
