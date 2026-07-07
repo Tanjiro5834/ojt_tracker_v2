@@ -24,7 +24,7 @@
       var(--paper);
     color:var(--ink);
     font-family:var(--font-body);
-    max-width:640px;
+    max-width:920px;
     margin:0 auto;
     padding:34px 28px 44px;
     border-radius:28px;
@@ -32,6 +32,16 @@
     box-shadow:0 20px 45px -28px rgba(225,78,130,.45), 0 1px 0 rgba(255,255,255,.7) inset;
     position:relative;
     overflow:hidden;
+  }
+  .ojt-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    align-items:start;
+  }
+  .ojt-col{display:flex;flex-direction:column;}
+  @media (max-width:720px){
+    .ojt-grid{grid-template-columns:1fr;}
   }
   .ojt-app::before{
     content:"✿";
@@ -194,6 +204,9 @@
     font-weight:600;
   }
 
+  .entry-list{max-height:520px;overflow-y:auto;padding-right:4px;}
+  .entry-list::-webkit-scrollbar{width:6px;}
+  .entry-list::-webkit-scrollbar-thumb{background:var(--rule);border-radius:999px;}
   .entry{
     display:grid;
     grid-template-columns:84px 50px 1fr;
@@ -320,59 +333,65 @@
         <button class="ojt-reset" id="resetBtn" type="button">Reset</button>
       </div>
 
-      <div class="card">
-        <h2>Progress</h2>
-        <div class="progress-wrap">
-          <div class="stamp-badge"><span>${pct}%</span></div>
-          <div style="flex:1">
-            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-            <div class="progress-meta">
-              <span>${done} / ${config.requiredHours} hrs</span>
-              <span>${remaining} hrs to go</span>
+      <div class="ojt-grid">
+        <div class="ojt-col">
+          <div class="card">
+            <h2>Progress</h2>
+            <div class="progress-wrap">
+              <div class="stamp-badge"><span>${pct}%</span></div>
+              <div style="flex:1">
+                <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                <div class="progress-meta">
+                  <span>${done} / ${config.requiredHours} hrs</span>
+                  <span>${remaining} hrs to go</span>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div class="card">
+            <h2>Log Today's Activity</h2>
+            <form id="entryForm">
+              <div class="row2">
+                <div class="field">
+                  <label for="entryDate">Date</label>
+                  <input type="date" id="entryDate" required>
+                </div>
+                <div class="field">
+                  <label for="entryHours">Hours</label>
+                  <input type="number" id="entryHours" min="0.5" step="0.5" placeholder="e.g. 8" required>
+                </div>
+              </div>
+              <div class="field">
+                <label for="entryTask">Task</label>
+                <input type="text" id="entryTask" placeholder="e.g. Built login module" required>
+              </div>
+              <div class="field">
+                <label for="entryRemarks">Remarks</label>
+                <textarea id="entryRemarks" placeholder="Notes, blockers, learnings..."></textarea>
+              </div>
+              <button class="btn" type="submit">Add Entry</button>
+            </form>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <h2>Log Today's Activity</h2>
-        <form id="entryForm">
-          <div class="row2">
-            <div class="field">
-              <label for="entryDate">Date</label>
-              <input type="date" id="entryDate" required>
-            </div>
-            <div class="field">
-              <label for="entryHours">Hours</label>
-              <input type="number" id="entryHours" min="0.5" step="0.5" placeholder="e.g. 8" required>
+        <div class="ojt-col">
+          <div class="card">
+            <h2>Entries (${entries.length})</h2>
+            <div id="entryList" class="entry-list">
+              ${sorted.length ? sorted.map(e=>`
+                <div class="entry" data-id="${e.id}">
+                  <div class="date">${fmtDate(e.date)}</div>
+                  <div class="hrs">${e.hours}h</div>
+                  <div>
+                    <p class="task">${escapeHtml(e.task)}</p>
+                    ${e.remarks ? `<p class="remarks">${escapeHtml(e.remarks)}</p>` : ''}
+                  </div>
+                  <button class="del" data-id="${e.id}" title="Delete entry">✕</button>
+                </div>
+              `).join('') : '<div class="empty">no entries yet — add your first one! ♡</div>'}
             </div>
           </div>
-          <div class="field">
-            <label for="entryTask">Task</label>
-            <input type="text" id="entryTask" placeholder="e.g. Built login module" required>
-          </div>
-          <div class="field">
-            <label for="entryRemarks">Remarks</label>
-            <textarea id="entryRemarks" placeholder="Notes, blockers, learnings..."></textarea>
-          </div>
-          <button class="btn" type="submit">Add Entry</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>Entries (${entries.length})</h2>
-        <div id="entryList">
-          ${sorted.length ? sorted.map(e=>`
-            <div class="entry" data-id="${e.id}">
-              <div class="date">${fmtDate(e.date)}</div>
-              <div class="hrs">${e.hours}h</div>
-              <div>
-                <p class="task">${escapeHtml(e.task)}</p>
-                ${e.remarks ? `<p class="remarks">${escapeHtml(e.remarks)}</p>` : ''}
-              </div>
-              <button class="del" data-id="${e.id}" title="Delete entry">✕</button>
-            </div>
-          `).join('') : '<div class="empty">no entries yet — add your first one! ♡</div>'}
         </div>
       </div>
     `;
