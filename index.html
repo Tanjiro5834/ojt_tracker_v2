@@ -43,6 +43,21 @@
   @media (max-width:720px){
     .ojt-grid{grid-template-columns:1fr;}
   }
+  @media (max-width:480px){
+    .ojt-app{padding:22px 16px 30px;border-radius:20px;}
+    .ojt-app::before{font-size:70px;}
+    .ojt-header{flex-wrap:wrap;gap:10px;}
+    .ojt-header h1{font-size:24px;}
+    .ojt-header .sub{font-size:14px;}
+    .card{padding:16px 14px 18px;border-radius:16px;}
+    .row2{grid-template-columns:1fr;gap:0;}
+    .progress-wrap{gap:14px;}
+    .stamp-badge{width:64px;height:64px;}
+    .stamp-badge span{font-size:15px;}
+    .entry{grid-template-columns:1fr;gap:2px;padding:12px 26px 12px 0;}
+    .entry .date,.entry .hrs{display:inline-block;margin-right:10px;}
+    .entry .del{top:12px;}
+  }
   .ojt-app::before{
     content:"✿";
     position:absolute;
@@ -289,7 +304,7 @@
     app.innerHTML = `
       <div class="ojt-header">
         <div>
-          <h1>Julie's OJT Diary<span class="flourish">✿</span></h1>
+          <h1>OJT Diary<span class="flourish">✿</span></h1>
           <div class="sub">let's set up your training record</div>
         </div>
       </div>
