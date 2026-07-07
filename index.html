@@ -241,29 +241,29 @@
     return dt.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
   }
 
-  async function loadData(){
+  function loadData(){
     try{
-      const c = await window.storage.get(CONFIG_KEY, false);
-      config = c ? JSON.parse(c.value) : null;
+      const c = localStorage.getItem(CONFIG_KEY);
+      config = c ? JSON.parse(c) : null;
     }catch(e){ config = null; }
     try{
-      const e = await window.storage.get(ENTRIES_KEY, false);
-      entries = e ? JSON.parse(e.value) : [];
+      const e = localStorage.getItem(ENTRIES_KEY);
+      entries = e ? JSON.parse(e) : [];
     }catch(e){ entries = []; }
     render();
   }
 
-  async function saveConfig(cfg){
+  function saveConfig(cfg){
     config = cfg;
     try{
-      await window.storage.set(CONFIG_KEY, JSON.stringify(cfg), false);
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
     }catch(e){ console.error('save config failed', e); }
     render();
   }
 
-  async function saveEntries(){
+  function saveEntries(){
     try{
-      await window.storage.set(ENTRIES_KEY, JSON.stringify(entries), false);
+      localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
     }catch(e){ console.error('save entries failed', e); }
     render();
   }
@@ -300,7 +300,7 @@
       const startDate = document.getElementById('startDate').value;
       const reqHours = Number(document.getElementById('reqHours').value);
       if(!startDate || !reqHours || reqHours<=0) return;
-      await saveConfig({startDate, requiredHours: reqHours});
+      saveConfig({startDate, requiredHours: reqHours});
     });
   }
 
@@ -385,12 +385,12 @@
       const remarks = document.getElementById('entryRemarks').value.trim();
       if(!date || !hours || !task) return;
       entries.push({id: Date.now().toString(36), date, hours, task, remarks});
-      await saveEntries();
+      saveEntries();
     });
 
     document.getElementById('resetBtn').addEventListener('click', async ()=>{
       if(!confirm('Reset diary? This clears your start date and required hours (entries stay).')) return;
-      try{ await window.storage.delete(CONFIG_KEY, false); }catch(e){}
+      localStorage.removeItem(CONFIG_KEY);
       config = null;
       render();
     });
@@ -399,7 +399,7 @@
       btn.addEventListener('click', async ()=>{
         const id = btn.getAttribute('data-id');
         entries = entries.filter(e=>e.id!==id);
-        await saveEntries();
+        saveEntries();
       });
     });
   }
