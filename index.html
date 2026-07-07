@@ -152,6 +152,7 @@
     border-color:var(--stamp);
     box-shadow:0 0 0 4px var(--stamp-tint);
   }
+  .field .hint{font-size:10.5px;color:var(--ink-soft);font-weight:500;margin-top:2px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
   .btn{
@@ -214,7 +215,7 @@
   .entry-list::-webkit-scrollbar-thumb{background:var(--rule);border-radius:999px;}
   .entry{
     display:grid;
-    grid-template-columns:84px 50px 1fr;
+    grid-template-columns:84px 1fr;
     gap:14px;
     padding:13px 0;
     border-bottom:1px dashed var(--rule);
@@ -224,7 +225,7 @@
   .entry:last-child{border-bottom:none;}
   .entry:hover{background:rgba(255,111,156,.06);border-radius:12px;}
   .entry .date{font-size:11.5px;color:var(--ink-soft);padding-top:1px;font-weight:600;}
-  .entry .hrs{font-size:12px;font-weight:700;color:var(--stamp-dark);padding-top:1px;}
+  .entry .hrs{font-size:12px;font-weight:700;color:var(--stamp-dark);margin:0 0 3px;}
   .entry .task{font-family:var(--font-display);font-size:14.5px;font-weight:600;margin:0 0 3px;color:var(--ink);}
   .entry .task::before{content:"♡ ";color:var(--stamp);}
   .entry .remarks{font-size:12px;color:var(--ink-soft);margin:0;line-height:1.5;}
@@ -290,6 +291,34 @@
     return dt.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
   }
 
+  // "6 30" -> {hours:6, minutes:30}. Overflow minutes roll into hours. Returns null if invalid.
+  function parseHoursInput(str){
+    const parts = String(str).trim().split(/\s+/).filter(Boolean).map(Number);
+    if(!parts.length || parts.some(n=>Number.isNaN(n)) ) return null;
+    let hours = parts[0] || 0;
+    let minutes = parts[1] || 0;
+    if(hours < 0 || minutes < 0) return null;
+    hours += Math.floor(minutes / 60);
+    minutes = minutes % 60;
+    if(hours === 0 && minutes === 0) return null;
+    return { hours, minutes };
+  }
+
+  function formatDuration(hours, minutes){
+    hours = Number(hours) || 0;
+    minutes = Number(minutes) || 0;
+    const h = hours ? `${hours} hour${hours === 1 ? '' : 's'}` : '';
+    const m = minutes ? `${minutes} minute${minutes === 1 ? '' : 's'}` : '';
+    if(h && m) return `${h} and ${m}`;
+    return h || m || '0 hours';
+  }
+
+  function decimalToHM(decimal){
+    const hours = Math.floor(decimal);
+    const minutes = Math.round((decimal - hours) * 60);
+    return { hours, minutes };
+  }
+
   function loadData(){
     try{
       const c = localStorage.getItem(CONFIG_KEY);
@@ -318,7 +347,7 @@
   }
 
   function totalHours(){
-    return entries.reduce((sum,e)=>sum+Number(e.hours||0),0);
+    return entries.reduce((sum,e)=> sum + Number(e.hours||0) + Number(e.minutes||0)/60, 0);
   }
 
   function renderSetup(){
@@ -357,6 +386,8 @@
     const done = totalHours();
     const pct = Math.min(100, Math.round((done/config.requiredHours)*100));
     const remaining = Math.max(0, config.requiredHours - done);
+    const doneHM = decimalToHM(done);
+    const remainingHM = decimalToHM(remaining);
 
     const sorted = [...entries].sort((a,b)=> b.date.localeCompare(a.date));
 
@@ -378,8 +409,8 @@
               <div style="flex:1">
                 <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
                 <div class="progress-meta">
-                  <span>${done} / ${config.requiredHours} hrs</span>
-                  <span>${remaining} hrs to go</span>
+                  <span>${doneHM.hours}h ${doneHM.minutes}m / ${config.requiredHours} hrs</span>
+                  <span>${remainingHM.hours}h ${remainingHM.minutes}m to go</span>
                 </div>
               </div>
             </div>
@@ -394,8 +425,9 @@
                   <input type="date" id="entryDate" required>
                 </div>
                 <div class="field">
-                  <label for="entryHours">Hours</label>
-                  <input type="number" id="entryHours" min="0.5" step="0.5" placeholder="e.g. 8" required>
+                  <label for="entryHours">Hours &amp; Minutes</label>
+                  <input type="text" id="entryHours" inputmode="numeric" placeholder="e.g. 6 30" required>
+                  <div class="hint">hours space minutes — e.g. "6 30" = 6h 30m</div>
                 </div>
               </div>
               <div class="field">
@@ -418,9 +450,9 @@
               ${sorted.length ? sorted.map(e=>`
                 <div class="entry" data-id="${e.id}">
                   <div class="date">${fmtDate(e.date)}</div>
-                  <div class="hrs">${e.hours}h</div>
                   <div>
                     <p class="task">${escapeHtml(e.task)}</p>
+                    <p class="hrs">${formatDuration(e.hours, e.minutes)}</p>
                     ${e.remarks ? `<p class="remarks">${escapeHtml(e.remarks)}</p>` : ''}
                   </div>
                   <button class="del" data-id="${e.id}" title="Delete entry">✕</button>
@@ -435,11 +467,11 @@
     document.getElementById('entryForm').addEventListener('submit', (ev)=>{
       ev.preventDefault();
       const date = document.getElementById('entryDate').value;
-      const hours = Number(document.getElementById('entryHours').value);
+      const parsed = parseHoursInput(document.getElementById('entryHours').value);
       const task = document.getElementById('entryTask').value.trim();
       const remarks = document.getElementById('entryRemarks').value.trim();
-      if(!date || !hours || !task) return;
-      entries.push({id: Date.now().toString(36), date, hours, task, remarks});
+      if(!date || !parsed || !task) return;
+      entries.push({id: Date.now().toString(36), date, hours: parsed.hours, minutes: parsed.minutes, task, remarks});
       saveEntries();
     });
 
